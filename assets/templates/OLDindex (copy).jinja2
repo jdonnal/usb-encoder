@@ -1,0 +1,39 @@
+{% extends "layout.jinja2" %}
+
+{% block title %} Bootstrap Interface {% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="assets/css/index.css">
+{% endblock %}
+
+{% block js %}
+    <script src="assets/js/index.js"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+            <h1 class="display-4">Bootstrap Interface</h1>
+            <p class="lead">
+                This module uses CSS and Javascript to create an interactive UI
+            </p>
+            <hr class="my-4">
+            <ul class="list-group">
+                <!-- example of jinja2 data -->
+                <li class="list-group-item">Static value injected with jinja2:
+                    <span class="message">{{ message }}</span>
+                </li>
+                <!-- example of AJAX data -->
+                <li class="list-group-item">Dynamic data loaded with AJAX:
+                    <!-- see assets/index.js for AJAX code -->
+                    <span id="data" class="message">&mdash;</span>
+                </li>
+            </ul>
+            <p class="lead mt-4">
+                <button class="btn btn-primary btn-lg" onclick="change_bkgd()">
+                    Get Data
+                </button>
+            </p>
+        </div>
+    </div>
+{% endblock %}

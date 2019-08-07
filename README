@@ -1,0 +1,9 @@
+Requires mccdaq uldaq library (docs available at https://github.com/mccdaq/uldaq)
+
+$> sudo apt install build-essential libusb-1.0.0-dev
+$> wget https://github.com/mccdaq/uldaq/releases/download/v1.1.1/libuldaq-1.1.1.tar.bz2
+$> cd libuldaq-1.1.1
+$> ./configure && make
+$> sudo make install
+
+$> pip3 install uldaq
