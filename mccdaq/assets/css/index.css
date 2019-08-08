@@ -9,3 +9,11 @@
     margin-left: 10px;
     font-weight: bold;
 }
+
+#stop{
+    display: none;
+}
+
+#filename{
+    font-family: monospace;
+}

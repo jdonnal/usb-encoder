@@ -27,12 +27,18 @@ setup(
     scripts=[],
     provides=[],
     install_requires=['joule',
-                      'uldaq'
+                      'uldaq',
                       'uvloop',
                       'aiohttp',],
     namespace_packages=[],
     packages=find_packages(exclude=["tests.*"]),
     include_package_data=True,
+
+    entry_points={
+            'console_scripts': [
+                'mccdaq-reader = mccdaq.reader:main',
+            ]
+        },
 
 
     #options={

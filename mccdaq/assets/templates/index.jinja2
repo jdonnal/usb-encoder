@@ -1,0 +1,35 @@
+{% extends "layout.jinja2" %}
+
+{% block title %} Recording Interface {% endblock %}
+
+{% block css %}
+    <link rel="stylesheet" href="assets/css/index.css">
+{% endblock %}
+
+{% block js %}
+    <script src="assets/js/index.js"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+            <h1 class="display-4">Recording Interface</h1>
+            <div id="stopped" class="lead">
+                <p>
+                    Enter a descriptive name for the data and click below to begin recording
+                </p>
+                <hr class="my-4">
+                <input type="text" id="title" placeholder="short title"></input>
+                <input type="textarea" id="content" placeholder="description"></input>
+                <button onclick="start()" class="btn btn-success btn-lg">Start Recording</button>
+            </div>
+            <div id="recording" class="lead">
+                <p>
+                    Video is being recorded to <a href="#" class="filename" id="filename"><a>
+                </p>
+                <hr class="my-4">
+	            <button onclick="stop()" class="btn btn-danger btn-lg">Stop Recording</button>
+            </div>
+        </div>
+    </div>
+{% endblock %}

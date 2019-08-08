@@ -41,7 +41,6 @@ class MccdaqReader(ReaderModule):
         try:
             # Get descriptors for all of the available DAQ devices.
             devices = get_daq_device_inventory(interface_type)
-            print(devices)
             number_of_devices = len(devices)
             if number_of_devices == 0:
                 raise ValueError('Error: No DAQ devices found')

@@ -3,3 +3,4 @@
 *.pyc
 build
 dist
+USBEncoder.egg-info
