@@ -105,10 +105,12 @@ class MccdaqReader(ReaderModule):
             XVect = []
             YVect = []
             ZVect = []
+            EVect = []
             AllVect = []
             startX = 0.0
             startY = 0.0
             startZ = 0.0
+            startE = 0.0
             # newZ = []
             prev_index = 0
 
@@ -138,27 +140,31 @@ class MccdaqReader(ReaderModule):
                 YVect = AllVect[1::5]
                 Z1Vect = AllVect[0::5]
                 Z2Vect = AllVect[2::5]
-
+                EVect = AllVect[4::5]
+                
                 end_time = cur_time + (len(XVect) - 1) * 1e3  # cur_time is in us
 
                 [XVect, startX] = processX(XVect, startX)
                 [YVect, startY] = processY(YVect, startY)
+                [EVect, startE] = processE(EVect, startE)
                 [ZVect, startZ] = processZ(Z1Vect, Z2Vect, startZ, cur_time, end_time)
 
                 Xarray = np.array(XVect)
                 Yarray = np.array(YVect)
                 Zarray = np.array(ZVect)
-
+                Earray = np.array(EVect)*-1 #invert for positive extrusion
+                
                 Xarray = np.vstack(Xarray)
                 Yarray = np.vstack(Yarray)
                 Zarray = np.vstack(Zarray)
-
+                Earray = np.vstack(Earray)
+                
                 time_array = np.linspace(cur_time, end_time, len(XVect))
 
                 time_array = np.vstack(time_array)
 
                 # print("before all output")
-                All_Output = np.hstack((time_array, Xarray, Yarray, Zarray))
+                All_Output = np.hstack((time_array, Xarray, Yarray, Zarray, Earray))
                 # print("after all output")
                 # print(All_Output)
                 await output.write(np.array(All_Output))
@@ -200,53 +206,44 @@ def get_supported_encoder_counters(ctr_info):
             encoders.append(counter_number)
     return encoders
 
-
-"""for encoder_index in range(encoder_count):
-                    message = str('chan =' + str((encoder_index + low_encoder)) + ': '+str('{:.6f}'.format(data[index +encoder_index])))
-                    curX=data[index+3] * (100.0/25726.0)
-                    curY=data[index+1] * (100.0/25725.0)
-                    curZ=(data[index]+ data[index+2])/2 * (10.0/40961)
-
-                    #if wraparound
-                    if abs(prevX-curX)>100:
-                        if prevX<curX:
-                            trueX = trueX-(Xthresh-curX+prevX)
-                        else:
-                            trueX = trueX + (Xthresh-prevX+curX)
-                    #no wraparound
-                    else:
-                        trueX = trueX + (curX-prevX)
-                    if abs(prevY-curY)>100:
-                        if prevY<curY:
-                            trueY = trueY-(Ythresh-curY+prevY)
-                        else:
-                            trueY = trueY + (Ythresh-prevY+curY)
-                    else:
-                        trueY = trueY + (curY-prevY)
-                    if abs(prevZ-curZ)>10:
-                        if prevZ<curZ:
-                            trueZ = trueZ-(Zthresh-curZ+prevX)
-                        else:
-                            trueZ = trueZ + (Zthresh-prevZ+curZ)
-                    else:
-                        trueZ = trueZ + (curZ-prevZ)
-                    prevX = curX
-                    prevY = curY
-                    prevZ = curZ
-                    await output.write(np.array([[time_now(),trueX,trueY,trueZ, index]]))"""
 # wrap-around variables
-"""trueX = 0.0
-trueY = 0.0
-trueZ = 0.0
-            
-prevX = 0.0
-prevY = 0.0
-prevZ= 0.0"""
 
 Xthresh = 254.8
 Ythresh = 254.8
 Zthresh = 16.0
+Ethresh = 30.9 #TODO
 
+import pdb
+def processE_new(data, ic):
+    # ic= initial condition (position in mm)
+    # data = raw counts from encoder
+
+    # convert counts to mm
+    scaled_data = np.array(data) *  (100.0 / 25726.0)*(5/41.22)
+    if(len(data)>2 and np.max(np.diff(data)>10)):
+        pdb.set_trace()
+    return scaled_data, ic
+
+def processE(E, startE):
+
+    prevE = startE
+    trueE = prevE
+    trueEVect = []
+    for e in E:
+        curE = e * (100.0 / 25726.0)*(5/41.22)  # convert to mm TODO!
+        if abs(prevE - curE) > 25:  # if wraparound
+            if prevE < curE:
+                trueE = trueE - (Ethresh - curE + prevE)
+            else:
+                trueE = trueE + (Ethresh - prevE + curE)
+        # no wraparound
+        else:
+            trueE = trueE + (curE - prevE)
+        trueEVect.append(trueE)
+        prevE = curE
+        if len(trueEVect) == 0:
+            trueEVect = [trueE]
+    return [trueEVect, trueEVect[len(trueEVect) - 1]]
 
 def processX(X, startX):
     prevX = startX
